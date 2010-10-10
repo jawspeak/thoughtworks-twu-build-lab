@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<project name="sampleAntBuildProject" basedir="." default="jar">
+    <property name="src" value="src/main/java"/>
+    <property name="test" value="src/test/java"/>
+
+    <property name="output" value="bin/classes"/>
+    <property name="test.output" value="bin/test-classes"/>
+
+    <path id="java.classpath">
+        <fileset dir="ant-lib/">
+            <include name="guava-r07.jar"/>
+        </fileset>
+    </path>
+
+    <path id="test.classpath">
+        <pathelement location="${output}"/>
+        <fileset dir="ant-lib/">
+            <include name="junit-4.8.1.jar"/>
+        </fileset>
+        <path refid="java.classpath"/>
+    </path>
+
+    <target name="compile" depends="clean">
+        <mkdir dir="bin/classes"/>
+        <javac destdir="bin/classes">
+            <src path="${src}"/>
+            <classpath refid="java.classpath"/>
+        </javac>
+    </target>
+
+    <target name="jar" depends="test">
+        <jar destfile="bin/sample-ant-project.jar">
+            <fileset dir="bin/classes"/>
+        </jar>
+    </target>
+
+    <target name="clean">
+        <delete dir="bin"/>
+    </target>
+
+    <target name="test" depends="compile">
+        <mkdir dir="bin/test-classes"/>
+        <javac destdir="${test.output}">
+            <src path="${test}"/>
+            <classpath refid="test.classpath"/>
+        </javac>
+        <mkdir dir="${test.output}"/>
+        <mkdir dir="bin/reports"/>
+                                          
+        <junit printsummary="yes" haltonfailure="yes" showoutput="yes">
+            <classpath>
+                <path refid="test.classpath"/>
+                <pathelement location="${test.output}"/>
+            </classpath>
+
+            <batchtest fork="yes" todir="bin/reports/">
+                <formatter type="plain"/>
+                <fileset dir="${test}">
+                    <include name="**/*Test*.java"/>
+                </fileset>
+            </batchtest>
+        </junit>
+
+    </target>
+
+</project>
